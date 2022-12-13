@@ -1,28 +1,16 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
+"""
+Miscellaneous utility functions
+"""
 
-# Set up custom environment before nearly anything else is imported
-# NOTE: this should be the first import (no not reorder)
-from vc_rcnn.utils.env import setup_environment  # noqa F401 isort:skip
-import env_tests.env as env_tests
-
-import os
-import copy
-
-from vc_rcnn.config import cfg as g_cfg
+import torch
 
 
-def get_config_root_path():
-    return env_tests.get_config_root_path()
-
-
-def load_config(rel_path):
-    ''' Load config from file path specified as path relative to config_root '''
-    cfg_path = os.path.join(env_tests.get_config_root_path(), rel_path)
-    return load_config_from_file(cfg_path)
-
-
-def load_config_from_file(file_path):
-    ''' Load config from file path specified as absolute path '''
-    ret = copy.deepcopy(g_cfg)
-    ret.merge_from_file(file_path)
-    return ret
+def cat(tensors, dim=0):
+    """
+    Efficient version of torch.cat that avoids a copy if there is only a single element in a list
+    """
+    assert isinstance(tensors, (list, tuple))
+    if len(tensors) == 1:
+        return tensors[0]
+    return torch.cat(tensors, dim)
